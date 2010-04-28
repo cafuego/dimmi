@@ -1,4 +1,4 @@
 name = Dimmi
-description = This module provides blocks with the <a href="http://dimmi.com.au/">Dimmi</a> booking and calendar widgets."
+description = This module provides blocks with the <a href="http://dimmi.com.au/">Dimmi</a> booking and calendar widgets.
 core = 6.x
 dependencies[] = block
