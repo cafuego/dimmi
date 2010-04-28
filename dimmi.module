@@ -1,0 +1,74 @@
+<?php
+/**
+ * Implementation of hook_block()
+ */
+function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
+
+  // List blocks on admin screen.
+  //
+  if ($op == 'list') {
+    $blocks = array();
+    $blocks[0] = array(
+      'info' => t('Dimmi: Booking Widget'),
+      'cache' => BLOCK_CACHE_GLOBAL,
+    );
+    $blocks[1] = array(
+      'info' => t('Dimmi: Calendar Widget'),
+      'cache' => BLOCK_CACHE_GLOBAL,
+    );
+    return $blocks;
+  }
+
+  // Show confguration. Allow 2 different resturant IDs.
+  //
+  if ($op == 'configure') {
+    $form['dimmi_id_' . $delta] = array(
+      '#type' => 'textfield',
+      '#title' => t('Dimmi ID'),
+      '#description' => t('Enter the Dimmi ID for your restaurant.'),
+      '#default_value' => variable_get('dimmi_id_' . $delta, 0),
+    );
+    return $form;
+  }
+
+  // Save configuration.
+  //
+  if ($op == 'save') {
+    if (intval($edit['dimmi_id_' . $delta])) {
+      variable_set('dimmi_id_' . $delta, $edit['dimmi_id_' . $delta]);
+    }
+    else {
+      drupal_set_message(t('The Dimmi ID must be a number.'), 'error');
+    }
+  }
+
+  // View the blocks.
+  //
+  if ($op == 'view') {
+    if ($delta == 0) {
+      $block = dimmi_booking_widget();
+    }
+    if ($delta == 1) {
+      $block = dimmi_calendar_widget();
+    }
+    return $block;
+  }
+}
+
+/**
+ * Show the booking widget.
+ */
+function dimmi_booking_widget() {
+  if ($id = variable_get('dimmi_id_0', 0)) {
+    drupal_add_js('http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=button', 'inline');
+  }
+}
+
+/**
+ * Show the calendar widget.
+ */
+function dimmi_calendar_widget() {
+  if ($id = variable_get('dimmi_id_1', 0)) {
+    drupal_add_js('http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=widget', 'inline');
+  }
+}
