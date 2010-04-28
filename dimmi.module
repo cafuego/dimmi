@@ -60,7 +60,10 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
  */
 function dimmi_booking_widget() {
   if ($id = variable_get('dimmi_id_0', 0)) {
-    drupal_add_js('http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=button', 'inline');
+    return array(
+      'subject' => t('Dimmi Booking Widget'),
+      'content' => '<script type="text/javascript" src="http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=button"></script>',
+    );
   }
 }
 
@@ -69,6 +72,9 @@ function dimmi_booking_widget() {
  */
 function dimmi_calendar_widget() {
   if ($id = variable_get('dimmi_id_1', 0)) {
-    drupal_add_js('http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=widget', 'inline');
+    return array(
+      'subject' => t('Dimmi Booking Widget'),
+      'content' => '<script type="text/javascript" src="http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=widget"></script>',
+    );
   }
 }
