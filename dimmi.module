@@ -1,4 +1,36 @@
 <?php
+
+// Defines!
+define('DIMMI_DEFAULT_BLOCKS', 2);
+
+/**
+ * Implementation of hook_help()
+ */
+function dimmi_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#dimmi':
+      include_once(drupal_get_path('module', 'dimmi') .'/help/dimmi_admin_help.inc');
+      return dimmi_settings_help();
+  }
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function dimmi_menu() {
+  $items = array();
+  $items['admin/settings/dimmi'] = array(
+    'title' => 'Dimmi Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dimmi_settings'),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer blocks'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'dimmi.admin.inc',
+  );
+  return $items;
+}
+
 /**
  * Implementation of hook_block()
  */
@@ -8,18 +40,16 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
   //
   if ($op == 'list') {
     $blocks = array();
-    $blocks[0] = array(
-      'info' => t('Dimmi: Booking Widget'),
-      'cache' => BLOCK_CACHE_GLOBAL,
-    );
-    $blocks[1] = array(
-      'info' => t('Dimmi: Calendar Widget'),
-      'cache' => BLOCK_CACHE_GLOBAL,
-    );
+    for ($delta = 0; $delta < variable_get('dimmi_blocks', DIMMI_DEFAULT_BLOCKS); $delta++) {
+      $blocks[$delta] = array(
+        'info' => t('Dimmi widget ') . $delta,
+        'cache' => BLOCK_CACHE_GLOBAL,
+      );
+    }
     return $blocks;
   }
 
-  // Show confguration. Allow 2 different resturant IDs.
+  // Show confguration. Set an ID and a widget type on each block.
   //
   if ($op == 'configure') {
     $form['dimmi_id_' . $delta] = array(
@@ -27,6 +57,16 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
       '#title' => t('Dimmi ID'),
       '#description' => t('Enter the Dimmi ID for your restaurant.'),
       '#default_value' => variable_get('dimmi_id_' . $delta, 0),
+    );
+    $form['dimmi_widget_' . $delta] = array(
+      '#type' => 'select',
+      '#title' => t('Widget Type'),
+      '#description' => t('Select the widget type that should be provided by this block.'),
+      '#options' => array(
+        'button' => t('Booking Widget'),
+        'widget' => t('Calendar Widget'),
+      ),
+      '#default_value' => variable_get('dimmi_widget_' . $delta, 'button'),
     );
     return $form;
   }
@@ -36,45 +76,35 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
   if ($op == 'save') {
     if (intval($edit['dimmi_id_' . $delta])) {
       variable_set('dimmi_id_' . $delta, $edit['dimmi_id_' . $delta]);
+      variable_set('dimmi_widget_' . $delta, $edit['dimmi_widget_' . $delta]);
     }
     else {
       drupal_set_message(t('The Dimmi ID must be a number.'), 'error');
     }
   }
 
-  // View the blocks.
+  // View the block.
   //
   if ($op == 'view') {
-    if ($delta == 0) {
-      $block = dimmi_booking_widget();
-    }
-    if ($delta == 1) {
-      $block = dimmi_calendar_widget();
-    }
-    return $block;
+    return dimmi_widget($delta);
   }
 }
 
 /**
- * Show the booking widget.
- */
-function dimmi_booking_widget() {
-  if ($id = variable_get('dimmi_id_0', 0)) {
-    return array(
-      'subject' => t('Dimmi Booking Widget'),
-      'content' => '<script type="text/javascript" src="http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=button"></script>',
-    );
-  }
-}
+ * Create a block with the configured widget.
 
-/**
- * Show the calendar widget.
+ * @param $delta
+ *   An integer indicating which block settings should be used.
+ *
+ * @return
+ *   A block array.
  */
-function dimmi_calendar_widget() {
-  if ($id = variable_get('dimmi_id_1', 0)) {
+function dimmi_widget($delta) {
+  if ($id = variable_get('dimmi_id_' . $delta , 0)) {
+    $widget = variable_get('dimmi_widget_' . $delta , 'button');
     return array(
-      'subject' => t('Dimmi Booking Widget'),
-      'content' => '<script type="text/javascript" src="http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=widget"></script>',
+      'subject' => t('Dimmi widget ') . $delta,
+      'content' => '<script type="text/javascript" src="http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=' . $widget . '"></script>',
     );
   }
 }
