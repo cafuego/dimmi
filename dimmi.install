@@ -1,0 +1,11 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_uninstall()
+ *
+ * Remove the dimmi_% settings from the variables table.
+ */
+function dimmi_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'dimmi%'");
+}
