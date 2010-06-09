@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 /**
  * The settings for for the Dimmi module.
