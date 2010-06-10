@@ -9,3 +9,44 @@
 function dimmi_uninstall() {
   db_query("DELETE FROM {variable} WHERE name LIKE 'dimmi%'");
 }
+
+/**
+ * Upgrade stored module variables to array format.
+ */
+function dimmi_update_6100() {
+  $ret = array();
+
+  // Used to have 2 blocks only. Booking and Calendar.
+  // Booking block.
+  if (!is_array(variable_get('dimmi_block_0', ''))) {
+    $block = array(
+      'id' => variable_get('dimmi_id_0', 0),
+      'description' => variable_get('dimmi_description_0', t('Dimmi: Booking Widget')),
+      'widget' => variable_get('dimmi_widget_0', 'button'),
+    );
+    variable_set('dimmi_block_0', $block);
+    $ret[] = array('success' => TRUE, 'query' => t('Converted old style booking widget block settings to new style.'));
+  }
+
+  // Calendar block.
+  if (!is_array(variable_get('dimmi_block_1', ''))) {
+    $block = array(
+      'id' => variable_get('dimmi_id_1', 0),
+      'description' => variable_get('dimmi_description_1', t('Dimmi: Calendar Widget')),
+      'widget' => variable_get('dimmi_widget_1', 'calendar'),
+    );
+    variable_set('dimmi_block_1', $block);
+    $ret[] = array('success' => TRUE, 'query' => t('Converted old style calendar widget block settings to new style.'));
+  }
+
+  // Remove the old style variables.
+  variable_del('dimmi_description_0');
+  variable_del('dimmi_id_0');
+  variable_del('dimmi_widget_0');
+  variable_del('dimmi_description_1');
+  variable_del('dimmi_id_1');
+  variable_del('dimmi_widget_1');
+
+  $ret[] = array('success' => TRUE, 'query' => t('Removed old unused block settings.'));
+  return $ret;
+}

@@ -42,8 +42,9 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
   if ($op == 'list') {
     $blocks = array();
     for ($delta = 0; $delta < variable_get('dimmi_blocks', DIMMI_DEFAULT_BLOCKS); $delta++) {
+      $block = dimmi_get_block($delta);
       $blocks[$delta] = array(
-        'info' => t('Dimmi widget ') . $delta,
+        'info' => $block['description'],
         'cache' => BLOCK_CACHE_GLOBAL,
       );
     }
@@ -53,13 +54,20 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
   // Show confguration. Set an ID and a widget type on each block.
   //
   if ($op == 'configure') {
-    $form['dimmi_id_' . $delta] = array(
+    $block = dimmi_get_block($delta);
+    $form['dimmi']['description'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Block description'),
+      '#description' => t('A brief description of your block. Used on the <a href="@block-overview-page">block overview page</a>.', array('@block-overview-page' => url('admin/build/block'))),
+      '#default_value' => $block['description'],
+    );
+    $form['dimmi']['id'] = array(
       '#type' => 'textfield',
       '#title' => t('Dimmi ID'),
       '#description' => t('Enter the Dimmi ID for your restaurant.'),
-      '#default_value' => variable_get('dimmi_id_' . $delta, 0),
+      '#default_value' => $block['id'],
     );
-    $form['dimmi_widget_' . $delta] = array(
+    $form['dimmi']['widget'] = array(
       '#type' => 'select',
       '#title' => t('Widget Type'),
       '#description' => t('Select the widget type that should be provided by this block.'),
@@ -67,7 +75,7 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
         'button' => t('Booking Widget'),
         'widget' => t('Calendar Widget'),
       ),
-      '#default_value' => variable_get('dimmi_widget_' . $delta, 'button'),
+      '#default_value' => $block['widget'],
     );
     return $form;
   }
@@ -76,8 +84,12 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
   //
   if ($op == 'save') {
     if (intval($edit['dimmi_id_' . $delta])) {
-      variable_set('dimmi_id_' . $delta, $edit['dimmi_id_' . $delta]);
-      variable_set('dimmi_widget_' . $delta, $edit['dimmi_widget_' . $delta]);
+      $dimmi = array(
+        'description' => $edit['description'],
+        'id' => $edit['id'],
+        'widget' => $edit['widget'],
+      );
+      variable_set('dimmi_block_' . $delta, $dimmi);
     }
     else {
       drupal_set_message(t('The Dimmi ID must be a number.'), 'error');
@@ -92,8 +104,16 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
 }
 
 /**
- * Create a block with the configured widget.
+ * Helper to retrieve the block configuration.
+ */
+function dimmi_get_block($delta) {
+  $default = array('description' => t('Dimmi: unconfigured @delta', array('@delta' => $delta)), 'id' => 0, 'widget' => 'button');
+  return variable_get('dimmi_block_' . $delta, $default);
+}
 
+/**
+ * Create a block with the configured widget.
+ *
  * @param $delta
  *   An integer indicating which block settings should be used.
  *
@@ -101,11 +121,11 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
  *   A block array.
  */
 function dimmi_widget($delta) {
-  if ($id = variable_get('dimmi_id_' . $delta , 0)) {
-    $widget = variable_get('dimmi_widget_' . $delta , 'button');
+  $block = dimmi_get_block($delta);
+  if (!empty($block['$id'])) {
     return array(
-      'subject' => t('Dimmi widget ') . $delta,
-      'content' => '<script type="text/javascript" src="http://cms.dimmi.com.au/Widget.js?ID=' . $id . '&view=' . $widget . '"></script>',
+      'subject' => $block['description'],
+      'content' => '<script type="text/javascript" src="http://cms.dimmi.com.au/Widget.js?ID=' . $block['id'] . '&view=' . $block['widget'] . '"></script>',
     );
   }
 }
