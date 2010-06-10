@@ -66,6 +66,8 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
       '#title' => t('Dimmi ID'),
       '#description' => t('Enter the Dimmi ID for your restaurant.'),
       '#default_value' => $block['id'],
+      '#size' => 6,
+      '#maxlength' => 6,
     );
     $form['dimmi']['widget'] = array(
       '#type' => 'select',
@@ -83,16 +85,17 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
   // Save configuration.
   //
   if ($op == 'save') {
-    if (intval($edit['dimmi_id_' . $delta])) {
+    $id = intval($edit['dimmi_id_' . $delta]);
+    if ($id > 0) {
       $dimmi = array(
         'description' => $edit['description'],
-        'id' => $edit['id'],
+        'id' => $id,
         'widget' => $edit['widget'],
       );
       variable_set('dimmi_block_' . $delta, $dimmi);
     }
     else {
-      drupal_set_message(t('The Dimmi ID must be a number.'), 'error');
+      drupal_set_message(t('The Dimmi ID must be a positive number.'), 'error');
     }
   }
 
