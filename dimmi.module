@@ -85,11 +85,10 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
   // Save configuration.
   //
   if ($op == 'save') {
-    $id = intval($edit['dimmi_id_' . $delta]);
-    if ($id > 0) {
+    if (intval($edit['id']) > 0) {
       $dimmi = array(
         'description' => $edit['description'],
-        'id' => $id,
+        'id' => $edit['id'],
         'widget' => $edit['widget'],
       );
       variable_set('dimmi_block_' . $delta, $dimmi);
@@ -125,7 +124,7 @@ function dimmi_get_block($delta) {
  */
 function dimmi_widget($delta) {
   $block = dimmi_get_block($delta);
-  if (!empty($block['$id'])) {
+  if (!empty($block['id'])) {
     return array(
       'subject' => $block['description'],
       'content' => '<script type="text/javascript" src="http://cms.dimmi.com.au/Widget.js?ID=' . $block['id'] . '&view=' . $block['widget'] . '"></script>',
