@@ -1,4 +1,4 @@
-; $Id$
+; $Id: dimmi.info,v 1.2 2010/06/10 04:37:49 cafuego Exp $
 
 name = Dimmi
 description = This module provides blocks with the <a href="http://dimmi.com.au/">Dimmi</a> booking and calendar widgets.

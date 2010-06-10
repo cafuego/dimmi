@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: dimmi.module,v 1.2 2010/06/10 04:37:49 cafuego Exp $
 
 // Defines!
 define('DIMMI_DEFAULT_BLOCKS', 2);

@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: dimmi.admin.inc,v 1.1 2010/06/10 04:37:49 cafuego Exp $
 
 /**
  * The settings for for the Dimmi module.

@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: dimmi_admin_help.inc,v 1.1 2010/06/10 04:37:49 cafuego Exp $
 
 /**
  * @file
