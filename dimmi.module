@@ -64,7 +64,7 @@ function dimmi_block($op = 'list', $delta = 0, $edit = array()) {
     $form['dimmi']['id'] = array(
       '#type' => 'textfield',
       '#title' => t('Dimmi ID'),
-      '#description' => t('Enter the Dimmi ID for your restaurant.'),
+      '#description' => t('Enter the Dimmi ID for your restaurant. You can obtain an ID at the <a href="@dimmi-website">Dimmi website</a>.', array('@dimmi-website' => url('http://dimmi.com.au/'))),
       '#default_value' => $block['id'],
       '#size' => 6,
       '#maxlength' => 6,
